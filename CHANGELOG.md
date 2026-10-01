@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- The canonical checksum works on json 3. `Checksum.json_round_trip` passed
+  `create_additions: false` to `JSON.parse`; json 3 removed that keyword, so
+  from the canonical cutover (2026-10-01T00:00:00Z) every audit row with a
+  Hash or Array field raised `ArgumentError: unknown keyword:
+  create_additions` before it was saved. Hosts on json 3 lost those rows
+  (luminality-web, LUMINALITY-WEB-1N). Hosts on json 2.x were unaffected,
+  and the digest is unchanged: JSON.parse never creates additions by default.
+
 ## [0.13.1] - 2026-09-25
 
 Fixes the checksum so it survives PostgreSQL `jsonb`

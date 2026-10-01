@@ -141,8 +141,11 @@ module StandardAudit
     # What a JSON column hands back for `value`: encoded exactly as
     # ActiveRecord's JSON type encodes on write, then parsed. Key ORDER is
     # the one thing this does not settle — canonical_json does.
+    #
+    # No `create_additions:` option: JSON.parse never creates additions by
+    # default, and json 3 removed the keyword (passing it raises).
     def json_round_trip(value)
-      JSON.parse(ActiveSupport::JSON.encode(value), max_nesting: false, create_additions: false)
+      JSON.parse(ActiveSupport::JSON.encode(value), max_nesting: false)
     end
 
     # Deterministic JSON: object keys sorted bytewise at every depth, no
