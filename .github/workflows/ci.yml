@@ -88,3 +88,42 @@ jobs:
 
       - name: Run tests on PostgreSQL
         run: bundle exec rspec
+
+  # The suite again on the lowest and highest json this gem runs on. The gem
+  # declares no json dependency, so the floor is the json Ruby 4.0 ships as a
+  # default gem (2.18.0) and the ceiling is the newest major. Every other leg
+  # resolves from the committed lockfile, where rubocop's `json ~> 2.3` holds
+  # json on 2.x — so json 3 had never run here when the canonical checksum
+  # shipped `JSON.parse(..., create_additions: false)`, an option json 3
+  # removed (LUMINALITY-WEB-1N, fixed in #166). Against that code this job
+  # fails 312 examples on json 3 and none on 2.18.0.
+  test-json:
+    name: test (json ${{ matrix.json }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        json: ["= 2.18.0", "~> 3.0"]
+    env:
+      RAILS_ENV: test
+      BUNDLE_GEMFILE: gemfiles/json.gemfile
+      JSON_VERSION: ${{ matrix.json }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@14594264cd68ce8a2345dd349bc3d138a4ef85c8 # v1.327.0
+        with:
+          ruby-version: 4.0.4
+          bundler-cache: true
+
+      - name: Run tests
+        run: |
+          bundle exec ruby -e 'require "json"; puts "json #{JSON::VERSION}"'
+          bundle exec rspec
