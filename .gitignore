@@ -13,3 +13,6 @@ spec/dummy/tmp/
 
 # Git worktrees
 .worktrees/
+
+# Resolved per JSON_VERSION by the json matrix job; never committed.
+/gemfiles/*.gemfile.lock

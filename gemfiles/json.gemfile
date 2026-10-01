@@ -1,0 +1,18 @@
+# The suite against a chosen json version (JSON_VERSION), for the json matrix
+# job in ci.yml. The main Gemfile cannot resolve json 3: rubocop pins
+# `json ~> 2.3`, so the committed lockfile — and every CI leg built from it —
+# has only ever run json 2.x. That is how the canonical checksum shipped
+# calling `JSON.parse(..., create_additions: false)`, which json 3 rejects
+# (LUMINALITY-WEB-1N). This gemfile drops the lint tooling so json can float.
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "json", ENV.fetch("JSON_VERSION")
+
+gem "sqlite3"
+
+group :development, :test do
+  gem "rspec-rails", "~> 8.0"
+  gem "shoulda-matchers", "~> 7.0"
+end
